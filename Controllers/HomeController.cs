@@ -10,12 +10,25 @@ namespace TodoApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IDbConnection _connection;
+        // NOTLAR : 
+        // Ýlk önce appsettings.json dosyasýnda ConnectionString ifadesini yazdýk ve default kýsmýnda da sql baðlantý kýsmýný yazdýk. ( ordan bakarsýn) 
 
-        public HomeController(IDbConnection connection)
+        //   "ConnectionStrings": {
+        //           "DefaultConnection": "Server=MERT;Database=DBTodoList;Integrated Security=true;TrustServerCertificate=True"
+        //                        },
+
+        // Sonrasýnda Program.cs kýsmýna geldik. (Program.cs kýsmýna not býraktým orada görürsün)
+
+        // En sonunda Controller kýsmýna geldik aþaðýdaki iki kodu yazdýk. Ve artýk Dependency Injection hazýr.
+
+        private readonly IDbConnection _connection;  // 1. yazýlan
+
+        public HomeController(IDbConnection connection) // 2. Yazýlan.
         {
             _connection = connection;
         }
+
+        // Dependecy Ýnjection aslýnda bizim sürekli SQLConnection baðlantý ifadesini yazmaktan kurtarýyor, baðlantýyý tek seferde yaptýktan sonra geriye kalanda onu çaðýrýyoruz.
 
         [HttpGet]
         public IActionResult Index(int? id)

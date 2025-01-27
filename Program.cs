@@ -12,13 +12,13 @@ namespace TodoApp
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddTransient<IDbConnection>(serviceProvider =>
+            builder.Services.AddTransient<IDbConnection>(serviceProvider => // Appsettings.json'da connectionstring ifadesini hallettiktens onra buraya kod yazdýk. 
             {
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
                 var connectionString = configuration.GetConnectionString("DefaultConnection");
 
                 return new SqlConnection(connectionString);
-            });
+            }); // Unutma bunu Builder.Services. AddControllersWithViews'in altýna yazman gerekiyor.
 
             var app = builder.Build();
 
