@@ -1,42 +1,56 @@
 # TodoApp (Dependency Injection)
 
-#Dependency Injection
-Dependecy İnjection aslında bizim sürekli SQLConnection bağlantı ifadesini yazmaktan kurtarıyor, bağlantıyı tek seferde yaptıktan sonra geriye kalanda onu çağırıyoruz.
+## Dependency Injection Nedir?
+Dependency Injection (DI), uygulama içinde sürekli olarak SQL bağlantısı veya başka bağımlılıkları tekrar tekrar tanımlamaktan kurtarır. Bağımlılığı bir kez tanımladıktan sonra, ihtiyacımız olduğunda çağırarak kullanabiliriz.
 
-#Dependecy İnjeciton İçin Yaptığımız Adımlar:
+---
 
-# 1-) Appsettings.Json'a ConnectionString bağlantısı Kurulması : 
+## Dependency Injection İçin Yaptığımız Adımlar
 
-appsettings.json Kısmına Eklediğimiz Kod : 
+### 1-) **`appsettings.json` Dosyasına ConnectionString Eklenmesi**
+`appsettings.json` dosyasına aşağıdaki kodu ekleyerek veritabanı bağlantısını tanımlıyoruz:
 
- "ConnectionStrings": {
-     "DefaultConnection": "Server=MERT;Database=DBTodoList;Integrated Security=true;TrustServerCertificate=True"
- },
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=MERT;Database=DBTodoList;Integrated Security=true;TrustServerCertificate=True"
+  }
+}
+```
 
-# 2-) Program.cs'e Servisin Kurulması : 
+---
 
-Program.cs kısmına eklediğimiz kod : 
+### 2-) **`Program.cs` Dosyasına Servis Tanımlanması**
+`Program.cs` dosyasına aşağıdaki kodu ekliyoruz. Bu kod, DI kullanarak SQL bağlantısını uygulama içinde kullanılabilir hale getirir.
 
-// Unutma bunu Builder.Services. AddControllersWithViews'in altına yazman gerekiyor.
+```csharp
+// Bu kodu Builder.Services.AddControllersWithViews'in altına yazmalısın.
+builder.Services.AddTransient<IDbConnection>(serviceProvider => 
+{
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+    return new SqlConnection(connectionString);
+});
+```
 
+---
 
- builder.Services.AddTransient<IDbConnection>(serviceProvider => 
- {
-     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-     var connectionString = configuration.GetConnectionString("DefaultConnection");
+### 3-) **Controller'de Dependency Injection Kullanımı**
+DI ile tanımladığımız bağlantıyı Controller içinde şu şekilde çağırabiliriz:
 
-     return new SqlConnection(connectionString);
- }); 
+```csharp
+// Her yeni controller açtığınızda bu bağlantıyı tanımlamanız gerekiyor.
 
-# 3-) Kullanılacak Controller'de Dependecy İnjection'un Çağrılması : 
+private readonly IDbConnection _connection;
 
-Ardından Controller Kısmında yapılması gereken işlemler : 
+public HomeController(IDbConnection connection) // Örneğin HomeController için tanımlıyoruz.
+{
+    _connection = connection;
+}
+```
 
-1-) Her yeni bir controller açtığın zaman bu bağlantıyı yapman gerekiyor.
+> **Not:** Eğer `AdminController` gibi farklı bir controller oluşturuyorsanız, constructor kısmını ona uygun şekilde düzenlemelisiniz: `public AdminController(IDbConnection connection)` gibi.
 
- private readonly IDbConnection _connection;  
+---
 
- public HomeController(IDbConnection connection)  // NOT : HomeController'de bu işlemi gördüğümüz için public HomeController yazdık. Eğer AdminController'de olsaydık Public AdminController yazardık.
- {
-     _connection = connection;
- }
+Bu adımları takip ederek Dependency Injection'ı projeye entegre edebilirsiniz. Her adım, hem okunabilir hem de sürdürülebilir bir kod yapısı sağlar.
