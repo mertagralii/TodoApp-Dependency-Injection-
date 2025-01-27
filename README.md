@@ -3,6 +3,9 @@
 #Dependency Injection
 Dependecy İnjection aslında bizim sürekli SQLConnection bağlantı ifadesini yazmaktan kurtarıyor, bağlantıyı tek seferde yaptıktan sonra geriye kalanda onu çağırıyoruz.
 
+#Dependecy İnjeciton İçin Yaptığımız Adımlar:
+
+# 1-) Appsettings.Json'a ConnectionString bağlantısı Kurulması : 
 
 appsettings.json Kısmına Eklediğimiz Kod : 
 
@@ -10,7 +13,10 @@ appsettings.json Kısmına Eklediğimiz Kod :
      "DefaultConnection": "Server=MERT;Database=DBTodoList;Integrated Security=true;TrustServerCertificate=True"
  },
 
+# 2-) Program.cs'e Servisin Kurulması : 
+
 Program.cs kısmına eklediğimiz kod : 
+
 // Unutma bunu Builder.Services. AddControllersWithViews'in altına yazman gerekiyor.
 
 
@@ -21,6 +27,8 @@ Program.cs kısmına eklediğimiz kod :
 
      return new SqlConnection(connectionString);
  }); 
+
+# 3-) Kullanılacak Controller'de Dependecy İnjection'un Çağrılması : 
 
 Ardından Controller Kısmında yapılması gereken işlemler : 
 
